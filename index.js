@@ -1,8 +1,7 @@
-
-
 const express = require('express');
 const cors = require('cors');
 const { MongoClient } = require('mongodb');
+const ObjectId = require('mongodb').ObjectId;
 require('dotenv').config();
 
 const app = express();
@@ -26,6 +25,7 @@ async function run() {
     console.log('database connected');
     const database = client.db('travelee');
     const serviceCollection = database.collection('services');
+    const bookingCollection = database.collection('booking');
 
 
     // GET API
@@ -36,13 +36,28 @@ async function run() {
       res.send(services);
     })
 
+    // GET SINGLE SERVICE API 
+    app.get('/services/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const service = await serviceCollection.findOne(query);
+      res.json(service);
+    })
+
     // POST SERVICE API
     app.post('/services', async (req, res) => {
       const service = req.body;
-      console.log(service);
       const result = await serviceCollection.insertOne(service);
       res.json(result);
     })
+
+//  POST BOOKING INFO
+    app.post('/booking', async (req, res) => {
+      const service = req.body;
+      console.log(service);
+      const result = await bookingCollection.insertOne(service);
+      res.send('result');
+    });
   }
   finally {
     
