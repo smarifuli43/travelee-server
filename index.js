@@ -25,14 +25,13 @@ async function run() {
     console.log('database connected');
     const database = client.db('travelee');
     const serviceCollection = database.collection('services');
-    const bookingCollection = database.collection('booking');
+    const orderCollection = database.collection('booking');
 
 
     // GET API
     app.get('/services', async (req, res) => {
       const cursor = serviceCollection.find({});
       const services = await cursor.toArray();
-      // console.log(services);
       res.send(services);
     })
 
@@ -44,6 +43,31 @@ async function run() {
       res.json(service);
     })
 
+    // GET MY ORDER
+    app.get('/myorder', async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email }
+      const cursor = orderCollection.find(query);
+      const orders = await cursor.toArray();
+      console.log(orders);
+      res.json(orders);
+    })
+
+   // GET ALL ORDER
+  app.get('/orders', async (req, res) => {
+    const cursor = orderCollection.find({});
+    const services = await cursor.toArray();
+    console.log(services);
+    res.send(services);
+  });
+// DELETE ORDERS
+    app.delete('/booking/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await orderCollection.deleteOne(query);
+      res.json(result);
+    });
+
     // POST SERVICE API
     app.post('/services', async (req, res) => {
       const service = req.body;
@@ -54,9 +78,8 @@ async function run() {
 //  POST BOOKING INFO
     app.post('/booking', async (req, res) => {
       const service = req.body;
-      console.log(service);
-      const result = await bookingCollection.insertOne(service);
-      res.send('result');
+      const result = await orderCollection.insertOne(service);
+      res.json(result);
     });
   }
   finally {
