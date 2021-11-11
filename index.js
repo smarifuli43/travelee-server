@@ -26,6 +26,7 @@ async function run() {
     const database = client.db('travelee');
     const serviceCollection = database.collection('services');
     const orderCollection = database.collection('booking');
+    const blogCollection = database.collection('blog');
 
 
     // GET API
@@ -58,6 +59,20 @@ async function run() {
     const services = await cursor.toArray();
     res.send(services);
   });
+  
+    // GET BLOG API
+     app.get('/blog', async (req, res) => {
+       const cursor = blogCollection.find({});
+       const services = await cursor.toArray();
+       res.send(services);
+     });
+    // GET specific blog
+      app.get('/blog/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: ObjectId(id) };
+        const blog = await blogCollection.findOne(query);
+        res.json(blog);
+      });
 
        // UPDATE API
     app.put('/booking/:id', async (req, res) => {
